@@ -100,9 +100,33 @@ router.post('/products', (req, res) => {
         })
      })
    }
-  
 
 })
+
+
+router.get('/products_by_id', (req, res) => {
+
+    let type = req.query.type
+    let productIds = req.query.id
+    // id=12312,1231231,123123 이거를
+    //이렇게 바꿈 productIds = ['12312', '1231231', '123123'] 받은 여러 id값을 배열로 만들어줌
+    if(type === "array"){
+        let ids = req.query.id.split(',')
+        productIds = ids.map(item => { //map으로 콤마 하나하나 박아줌
+            return item
+        })
+    }
+    //이제 여러개 상품 id을 이용하여 여러 개 삼품 가져올 수 있게됨
+
+    //productIds을 이용해서 DB에서 productId와 같은 상품의 정보를 가져온다.
+    Product.find({_id: {$in: productIds }}) //id값이 여러개 들어 있는 배열을 못넣어서 $in을 사용함 
+    .populate('writer')
+    .exec((err, product) => {
+        if(err) return res.status(400).send(err)
+        return res.status(200).send({success: true, product})
+    })
+})
+
 
 
 
