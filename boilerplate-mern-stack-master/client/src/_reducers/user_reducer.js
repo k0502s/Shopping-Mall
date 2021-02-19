@@ -4,7 +4,8 @@ import {
     AUTH_USER,
     LOGOUT_USER,
     ADD_TO_CART,
-    GET_CART_ITEMS
+    GET_CART_ITEMS,
+    REMOVE_CART_ITEM
 } from '../_actions/types';
  
 
@@ -21,12 +22,18 @@ export default function(state={},action){
         case ADD_TO_CART:
             return {...state, 
                    userData: {
-                       ...state.userData,   //
-                       cart: action.payload //이해하기
+                       ...state.userData,   //state에 있는 userData또한 필요하기 때문이다.
+                       cart: action.payload //
                    }
                 }
-         case  GET_CART_ITEMS:
-            return {...state }
+        case  GET_CART_ITEMS:
+            return {...state, cartDetail: action.payload }
+        case  REMOVE_CART_ITEM:
+            return {...state, cartDetail: action.payload.productInfo, 
+                              userData: {
+                                  ...state.userData,        //마찬가지로 삭제 후 업데이트 된 정보를
+                                  cart: action.payload.cart// 카트를 담을때처럼 다시 합쳐준다.
+                              }}
 
         default:
             return state;

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { User } = require("../models/User");
+const { Product } = require("../models/Product");
 
 const { auth } = require("../middleware/auth");
 
@@ -77,11 +78,11 @@ router.post("/addToCart", auth, (req, res) => {
    //req.user === user //middleware을 통과하여 토큰에서 얻어온 user의 id값 가져옴
    User.findOne({_id: req.user._id},
    (err, userInfo) => {
+
     //가져온 정보에서 카트에다 넣으려하는 상품이 이미 들어 있는지 확인
     let duplicate = false;
-
     userInfo.cart.forEach((item) => {
-        if(item.id === req.body.productId){
+        if(item.id === req.body.productId){ //product와 user에 들가있는 cart id 값을 비교해서 확인
             duplicate = true;
         }
     })
@@ -124,5 +125,41 @@ router.post("/addToCart", auth, (req, res) => {
    })
 
 });
+
+
+router.get('/removeFromCart', auth, (req, res) => {
+
+        //먼저 cart 안에 내가 지우려고 한 상품을 지워주기
+    User.findOneAndUpdate(
+        {_id: req.user._id},
+        {    //$push와 반대 개념이다. 끌어오는 것이니 없어버린다는 것이다.
+            $pull:
+            {cart: {id: req.query.id}}
+        },
+        {new: true},
+        (err, userInfo) => {
+            let cart = userInfo.cart;
+            let array = cart.map(item => {
+                return item.id
+            })
+
+    //product collection에서 현재 남아있는 삼푸들의 정보를 가져오기
+
+
+    //변수 array에 담겨있는 id 값들을 $in으로 productIds = ['123123124', '12312312'] 이런식으로 바꿔줌.
+         Product.find({_id: {$in: array }})
+        .populate('writer')
+        .exec((err, productInfo) => {
+          return res.status(200).json({
+            productInfo,//원하는 카트 삭제한 해당 product 콜렉션 값 가져옴(클라이언트에서 합쳐 다시 카트 페이지에 놓아주기 위한것임)
+            cart //원하는 카트 삭제 후 업데이트 된 값이 담겨있는 cart
+          })
+       })
+        }
+    )    
+
+
+        
+})
 
 module.exports = router;

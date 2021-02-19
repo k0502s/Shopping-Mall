@@ -111,7 +111,7 @@ router.get('/products_by_id', (req, res) => {
     // id=12312,1231231,123123 이거를
     //이렇게 바꿈 productIds = ['12312', '1231231', '123123'] 받은 여러 id값을 배열로 만들어줌
     if(type === "array"){
-        let ids = req.query.id.split(',')
+        let ids = req.query.id.split(',');
         productIds = ids.map(item => { //map으로 콤마 하나하나 박아줌
             return item
         })
@@ -123,7 +123,7 @@ router.get('/products_by_id', (req, res) => {
     .populate('writer')
     .exec((err, product) => {
         if(err) return res.status(400).send(err)
-        return res.status(200).send({success: true, product})
+        return res.status(200).send(product)
     })
 })
 

@@ -24,7 +24,8 @@ const handleChange = (e) => {
            <Collapse defaultActiveKey={['0']}>
              <Panel header="Price" key="1">
              <Radio.Group onChange={handleChange} value={Value}>
-                {renderRadioBox()}
+             {/* //랜더링 */}
+                {renderRadioBox()} 
              </Radio.Group>   
              </Panel>
            </Collapse>

@@ -5,7 +5,8 @@ import {
     AUTH_USER,
     LOGOUT_USER,
     ADD_TO_CART,
-    GET_CART_ITEMS
+    GET_CART_ITEMS,
+    REMOVE_CART_ITEM
 } from './types';
 import { USER_SERVER } from '../components/Config.js';
 
@@ -67,17 +68,52 @@ export function addToCart(id){
 
 export function getCartItems(cartItems, userCart){
 
-   
-    
-    const request = Axios.get(`/api/product/product_by_id?id=${cartItems}&type=array`, body)
+
+                                                            //서버에서 req.query 부분
+    const request = Axios.get(`/api/product/products_by_id?id=${cartItems}&type=array`)
     .then(response =>{
             //CartItem 들에 해당하는 정보들을 product Collection에서 가져온 후에
 
-            //Quantity 정보를 넣어 준다.
+            //Quantity 정보를 넣어 준다. 즉 product 정보와, cart 정보의 Quantity의 조합이다.
+            userCart.forEach(cartItem => {
+                response.data.forEach((productDetail, index) => {
+                    if(cartItem.id === productDetail._id) {
+                        response.data[index].quantity = cartItem.quantity
+                    }
+                })
+            })
+            return response.data;
     });
     return {
         type: GET_CART_ITEMS,
         payload: request
     }
 }
+
+export function removeCartItem(productId){
+
+   
+                                                        //서버에서 req.query 부분
+    const request = Axios.get(`/api/users/removeFromCart?id=${productId}`)
+    .then(response =>{
+            
+        //productInfo, cart 정보를 조합해서 CartDetail을 만든다.
+
+ //이미 서버쪽에서 원하는 정보를 삭제하였고 원래 카트에 담을 때도 합쳤으므로 다시 합쳐서 데이터를 보내준다.
+        response.data.cart.forEach(item => {
+            response.data.productInfo.forEach((product, index) => {
+                if(item.id === product._id){
+                    response.data.productInfo[index].quantity = item.quantity
+                }
+            })
+        })
+            return response.data;
+    });
+    return {
+        type: REMOVE_CART_ITEM,
+        payload: request
+    }
+}
+
+
 
