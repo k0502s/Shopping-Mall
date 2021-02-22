@@ -5,7 +5,9 @@ import {
     LOGOUT_USER,
     ADD_TO_CART,
     GET_CART_ITEMS,
-    REMOVE_CART_ITEM
+    REMOVE_CART_ITEM,
+    ON_SUCCESS_BUY,
+    DELETE_HISTORY
 } from '../_actions/types';
  
 
@@ -34,7 +36,13 @@ export default function(state={},action){
                                   ...state.userData,        //마찬가지로 삭제 후 업데이트 된 정보를
                                   cart: action.payload.cart// 카트를 담을때처럼 다시 합쳐준다.
                               }}
-
+        case  ON_SUCCESS_BUY:
+            return {...state, cartDetail: action.payload.cartDetail,
+            userData:{...state.userData, cart: action.payload.cart}} 
+        case  DELETE_HISTORY:
+            return {...state,  userData: 
+                action.payload.historyInfo
+            }                          
         default:
             return state;
     }

@@ -6,7 +6,9 @@ import {
     LOGOUT_USER,
     ADD_TO_CART,
     GET_CART_ITEMS,
-    REMOVE_CART_ITEM
+    REMOVE_CART_ITEM,
+    ON_SUCCESS_BUY,
+    DELETE_HISTORY
 } from './types';
 import { USER_SERVER } from '../components/Config.js';
 
@@ -90,6 +92,8 @@ export function getCartItems(cartItems, userCart){
     }
 }
 
+
+
 export function removeCartItem(productId){
 
    
@@ -110,10 +114,40 @@ export function removeCartItem(productId){
             return response.data;
     });
     return {
-        type: REMOVE_CART_ITEM,
+        type:REMOVE_CART_ITEM,
         payload: request
     }
 }
+
+
+
+export function onSuccessBuy(data){
+
+    const request = Axios.post(`/api/users/successBuy`, data)
+    .then(response => response.data);
+
+    return {
+        type: ON_SUCCESS_BUY,
+        payload: request
+    }
+}
+
+
+
+
+export function deletehistory(historyId){
+
+    const request = Axios.get(`/api/users/DeleteHistory?id=${historyId}`)
+    .then(response =>response.data);
+    
+    return {
+        type: DELETE_HISTORY,
+        payload: request
+    }
+}
+
+
+
 
 
 
